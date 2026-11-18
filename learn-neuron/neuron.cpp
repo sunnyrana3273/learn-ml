@@ -7,7 +7,8 @@ using namespace std;
 float loss(float actual, float predicted);
 float predict(float w1, float w2, float x1, float x2, float bias);
 float averageLoss(const vector<vector <int>>& examples, float w1, float w2, float bias);
-float updateWeight1(const vector<vector <int>>& examples, float w1, float w2, float bias, float learnignRate);
+float updateWeight1(const vector<vector <int>>& examples, float w1, float w2, float bias, float learningRate);
+float updateWeight2(const vector<vector <int>>& examples, float w1, float w2, float bias, float learningRate);
 
 
 int main() {
@@ -17,8 +18,15 @@ int main() {
   float learningRate = 0.1; 
   // x1, x2, expected result
   const vector<vector <int>>& examples = {{2, 3, 5}, {4, 7, 11}, {1, 9, 10}, {8, 2, 10}};
+  
+  cout << "Original weights: " << endl;
+  cout << w1 << endl << w2 << endl;
 
-  cout << updateWeight1(examples, w1, w2, bias, learningRate) << endl;
+  w1 = updateWeight1(examples, w1, w2, bias, learningRate);
+  w2 = updateWeight2(examples, w1, w2, bias, learningRate);
+
+  cout << "Updated weights: " << endl;
+  cout << w1 << endl << w2 << endl;
 }
 
 float loss(float actual, float predicted) {
@@ -53,15 +61,30 @@ float updateWeight1(const vector<vector <int>>& examples, float w1, float w2, fl
   float incLoss = averageLoss(examples, incWeight, w2, bias);
   float decLoss = averageLoss(examples, decWeight, w2, bias);
 
-  cout << originalLoss << endl << incLoss << endl << decLoss << endl;
-
-  if (incLoss < decLoss && incLoss < originalLoss) {
+  if (incLoss <= decLoss && incLoss < originalLoss) {
     return incWeight;
-  } else if (decLoss < incLoss && decLoss < originalLoss) {
+  } else if (decLoss <= incLoss && decLoss < originalLoss) {
     return decWeight;
   } else {
     return w1;
   }
+}
 
+float updateWeight2(const vector<vector <int>>& examples, float w1, float w2, float bias, float learningRate) {
+  float incWeight = w2 + learningRate;
+  float decWeight = w2 - learningRate;
+
+  float originalLoss = averageLoss(examples, w1, w2, bias);
+
+  float incLoss = averageLoss(examples, w1, incWeight, bias);
+  float decLoss = averageLoss(examples, w1, decWeight, bias);
+
+  if (incLoss <= decLoss && incLoss < originalLoss) {
+    return incWeight;
+  } else if (decLoss <= incLoss && decLoss < originalLoss) {
+    return decWeight;
+  } else {
+    return w2;
+  }
 }
 
